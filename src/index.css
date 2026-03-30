@@ -1,0 +1,109 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  html { scroll-behavior: smooth; }
+  
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #F8F9FA;
+    color: #333;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background: #F5C400;
+    color: #0A3C45;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-gold text-teal font-body font-semibold px-8 py-3 rounded-full 
+           hover:bg-gold-dark transition-all duration-300 hover:shadow-lg 
+           hover:shadow-gold/30 active:scale-95 inline-flex items-center gap-2;
+  }
+
+  .btn-outline {
+    @apply border-2 border-white text-white font-body font-semibold px-8 py-3 
+           rounded-full hover:bg-white hover:text-teal transition-all duration-300 
+           active:scale-95 inline-flex items-center gap-2;
+  }
+
+  .section-title {
+    @apply font-display text-4xl md:text-5xl font-bold text-teal leading-tight;
+  }
+
+  .section-subtitle {
+    @apply font-body text-gray-500 text-lg mt-4 max-w-2xl mx-auto;
+  }
+
+  .card-glass {
+    @apply bg-white/80 backdrop-blur-sm border border-white/50 rounded-2xl shadow-lg;
+  }
+
+  .gold-gradient {
+    background: linear-gradient(135deg, #F5C400, #FFD84D);
+  }
+
+  .teal-gradient {
+    background: linear-gradient(135deg, #0A3C45, #0E5464);
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-thumb { background: #F5C400; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #D4A900; }
+
+/* Shimmer loading */
+.shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Floating WhatsApp */
+.whatsapp-float {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 999;
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Hero grain overlay */
+.grain::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Animated underline */
+.animated-underline {
+  position: relative;
+  display: inline-block;
+}
+.animated-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 3px;
+  background: #F5C400;
+  transition: width 0.3s ease;
+  border-radius: 2px;
+}
+.animated-underline:hover::after { width: 100%; }
+
+/* Swiper custom */
+.swiper-pagination-bullet { background: #F5C400 !important; }
+.swiper-pagination-bullet-active { background: #0A3C45 !important; }
