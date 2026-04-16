@@ -1,36 +1,64 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   FaBox,
   FaBookmark,
   FaEnvelope,
   FaHome,
+  FaCog,
+  FaListAlt,
   FaBars,
   FaTimes,
   FaSignOutAlt,
 } from "react-icons/fa";
+import { getAdminStats } from "../../api";
 import { useAuth } from "../../context/AuthContext";
-import { SAMPLE_MESSAGES } from "./adminData";
 
 const NAV_ITEMS = [
   { to: "/admin", label: "Dashboard", icon: FaHome, end: true },
   { to: "/admin/packages", label: "Packages", icon: FaBox },
   { to: "/admin/bookings", label: "Bookings", icon: FaBookmark },
   { to: "/admin/messages", label: "Messages", icon: FaEnvelope },
+  { to: "/admin/subscriptions", label: "Subscriptions", icon: FaListAlt },
+  { to: "/admin/settings", label: "Settings", icon: FaCog },
 ];
 
 export default function AdminLayout() {
   const { admin, logout } = useAuth();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [counts, setCounts] = useState({
+    unreadBookings: 0,
+    unreadMessages: 0,
+    unreadSubscriptions: 0,
+  });
+
+  const refreshAdminCounts = async () => {
+    try {
+      const { data } = await getAdminStats();
+      setCounts({
+        unreadBookings: Number(data?.unreadBookings || 0),
+        unreadMessages: Number(data?.unreadMessages || 0),
+        unreadSubscriptions: Number(data?.unreadSubscriptions || 0),
+      });
+    } catch {
+      setCounts({
+        unreadBookings: 0,
+        unreadMessages: 0,
+        unreadSubscriptions: 0,
+      });
+    }
+  };
+
+  useEffect(() => {
+    refreshAdminCounts();
+  }, []);
 
   const handleLogout = () => {
     logout();
     localStorage.removeItem("auth_token");
     navigate("/admin/login");
   };
-
-  const unreadCount = SAMPLE_MESSAGES.filter((m) => !m.read).length;
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
@@ -99,9 +127,19 @@ export default function AdminLayout() {
             >
               <item.icon size={16} />
               {item.label}
-              {item.label === "Messages" && unreadCount > 0 && (
+              {item.label === "Bookings" && counts.unreadBookings > 0 && (
+                <span className="ml-auto bg-amber-500 text-white text-xs min-w-5 h-5 px-1 rounded-full flex items-center justify-center">
+                  {counts.unreadBookings}
+                </span>
+              )}
+              {item.label === "Messages" && counts.unreadMessages > 0 && (
                 <span className="ml-auto bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
-                  {unreadCount}
+                  {counts.unreadMessages}
+                </span>
+              )}
+              {item.label === "Subscriptions" && counts.unreadSubscriptions > 0 && (
+                <span className="ml-auto bg-sky-500 text-white text-xs min-w-5 h-5 px-1 rounded-full flex items-center justify-center">
+                  {counts.unreadSubscriptions}
                 </span>
               )}
             </NavLink>
@@ -118,7 +156,7 @@ export default function AdminLayout() {
       </aside>
 
       <main className="flex-1 p-4 md:p-8 md:ml-64 pt-20 md:pt-8">
-        <Outlet />
+        <Outlet context={{ refreshAdminCounts }} />
       </main>
     </div>
   );

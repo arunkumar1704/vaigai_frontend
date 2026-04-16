@@ -1,19 +1,30 @@
-import { useState } from 'react'
-import { motion } from 'framer-motion'
-import { useInView } from 'react-intersection-observer'
-import { FaEnvelope, FaArrowRight } from 'react-icons/fa'
-import toast from 'react-hot-toast'
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { useInView } from "react-intersection-observer";
+import { FaEnvelope, FaArrowRight } from "react-icons/fa";
+import toast from "react-hot-toast";
+import { subscribeNewsletter } from "../../api";
 
 export default function NewsletterSection() {
-  const [email, setEmail] = useState('')
-  const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.2 })
+  const [email, setEmail] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.2 });
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    if (!email) return
-    toast.success('Subscribed! Watch your inbox for Tamil Nadu travel inspiration.')
-    setEmail('')
-  }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!email) return;
+
+    setSubmitting(true);
+    try {
+      const { data } = await subscribeNewsletter({ email });
+      toast.success(data?.message || "Subscribed successfully");
+      setEmail("");
+    } catch (err) {
+      toast.error(err?.response?.data?.message || "Subscription failed");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <section className="py-16 bg-white" ref={ref}>
@@ -43,13 +54,17 @@ export default function NewsletterSection() {
               <input
                 type="email"
                 value={email}
-                onChange={e => setEmail(e.target.value)}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email address"
                 required
                 className="flex-1 px-5 py-3.5 rounded-full font-body bg-white/90 border-2 border-transparent focus:outline-none focus:border-teal text-teal placeholder-gray-400"
               />
-              <button type="submit" className="bg-teal text-white font-body font-semibold px-6 py-3.5 rounded-full hover:bg-teal-dark transition-colors flex items-center gap-2 justify-center">
-                Subscribe <FaArrowRight size={14} />
+              <button
+                type="submit"
+                disabled={submitting}
+                className="bg-teal text-white font-body font-semibold px-6 py-3.5 rounded-full hover:bg-teal-dark transition-colors flex items-center gap-2 justify-center disabled:opacity-60"
+              >
+                {submitting ? "Subscribing..." : "Subscribe"} <FaArrowRight size={14} />
               </button>
             </form>
             <p className="text-teal/50 text-xs mt-4">No spam. Unsubscribe anytime.</p>
@@ -57,5 +72,5 @@ export default function NewsletterSection() {
         </motion.div>
       </div>
     </section>
-  )
+  );
 }

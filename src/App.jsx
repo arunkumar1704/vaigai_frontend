@@ -14,8 +14,11 @@ import AdminHome from "./pages/admin/AdminHome";
 import AdminPackages from "./pages/admin/AdminPackages";
 import AdminBookings from "./pages/admin/AdminBookings";
 import AdminMessages from "./pages/admin/AdminMessages";
+import AdminSettings from "./pages/admin/AdminSettings";
+import AdminSubscriptions from "./pages/admin/AdminSubscriptions";
 import ProtectedRoute from "./components/layout/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
+import { SiteSettingsProvider } from "./context/SiteSettingsContext";
 import Footer from "./components/layout/Footer";
 
 export default function App() {
@@ -24,33 +27,37 @@ export default function App() {
 
   return (
     <AuthProvider>
-      {!isAdmin && <Navbar />}
-      <AnimatePresence mode="wait">
-        <Routes location={location} key={location.pathname}>
-          <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/destinations" element={<Destinations />} />
-          <Route path="/packages" element={<Packages />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/book/:packageId" element={<BookingPage />} />
-          <Route path="/admin/login" element={<AdminLogin />} />
-          <Route
-            path="/admin"
-            element={
-              <ProtectedRoute>
-              <AdminLayout />
-              </ProtectedRoute>
-            }
-          >
-            <Route index element={<AdminHome />} />
-            <Route path="packages" element={<AdminPackages />} />
-            <Route path="bookings" element={<AdminBookings />} />
-            <Route path="messages" element={<AdminMessages />} />
-          </Route>
-        </Routes>
-      </AnimatePresence>
-      {!isAdmin && <Footer />}
-      {!isAdmin && <WhatsAppButton />}
+      <SiteSettingsProvider>
+        {!isAdmin && <Navbar />}
+        <AnimatePresence mode="wait">
+          <Routes location={location} key={location.pathname}>
+            <Route path="/" element={<Home />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/destinations" element={<Destinations />} />
+            <Route path="/packages" element={<Packages />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/book/:packageId" element={<BookingPage />} />
+            <Route path="/admin/login" element={<AdminLogin />} />
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute>
+                <AdminLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<AdminHome />} />
+              <Route path="packages" element={<AdminPackages />} />
+              <Route path="bookings" element={<AdminBookings />} />
+              <Route path="messages" element={<AdminMessages />} />
+              <Route path="subscriptions" element={<AdminSubscriptions />} />
+              <Route path="settings" element={<AdminSettings />} />
+            </Route>
+          </Routes>
+        </AnimatePresence>
+        {!isAdmin && <Footer />}
+        {!isAdmin && <WhatsAppButton />}
+      </SiteSettingsProvider>
     </AuthProvider>
   );
 }
